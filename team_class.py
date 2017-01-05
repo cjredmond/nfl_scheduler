@@ -64,6 +64,12 @@ class Team:
             total += game.matching_weeks_non_bye(ls)
         return total
 
+    def bye_options(self,ls):
+        total = 0
+        for game in self.total_schedule(ls):
+            total += game.matching_weeks(ls)
+        return total
+
 
 
 
@@ -73,11 +79,11 @@ class Game:
         self.home = home
         self.away = away
 
-    def __str(self):
-        return str(self.week) + self.home.name, self.away.name
+    def __str__(self):
+        return str(self.week) + self.home.name + self.away.name
 
     def __unicode__(self):
-        return str(self.week) + self.home.name, self.away.name
+        return str(self.week) + self.home.name + self.away.name
 
     def __repr__(self):
         return str(self.week) + str(self.home.name)+ str(self.away.name)
@@ -89,9 +95,23 @@ class Game:
                 weeks.remove(game.week)
         for game in self.away.total_schedule(ls):
             if game.week != 0:
+                if game.week in weeks:
+                    weeks.remove(game.week)
+        return len(weeks)
+
+    def matching_weeks(self, ls):
+        weeks = [4,5,6,7,8,9,10,11,13]
+        for game in self.home.total_schedule(ls):
+            if game.week in weeks:
+                weeks.remove(game.week)
+        for game in self.away.total_schedule(ls):
+            if game.week in weeks:
                 if game in weeks:
                     weeks.remove(game.week)
         return len(weeks)
 
     def delete_target(self,ls):
         return self.home.non_bye_options(ls) + self.away.non_bye_options(ls)
+
+    def bye_delete_target(self,ls):
+        return self.home.bye_options(ls) + self.away.bye_options(ls)
