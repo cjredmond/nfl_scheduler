@@ -135,12 +135,12 @@ while len(amount) < 100:
     non_bye_weeks(team)
 
 
-while len(amount) < 129:
+while len(amount) <= 128:
     team = sorted(teams, key= lambda t: -t.non_bye_options(games))[0]
     non_bye_weeks(team)
     if len(amount) > 115:
         new_amount = sorted(amount, key = lambda t: t.week)
-        a = open('new.csv', 'w')
+        a = open('blank_game_output.csv', 'w')
         b = csv.writer(a)
         for y in new_amount:
             a.write(str(y.week) + y.home.name + y.away.name+ "\n")
