@@ -141,7 +141,7 @@ def bye_weeks(team):
     for week in team.weeks_already_played(games):
         if week in weeks:
             weeks.remove(week)
-    if len(weeks) > 0:
+    if len(weeks) > 1:
         rand_week = random.choice(weeks)
         weeks.remove(rand_week)
         avl_games = team.games_available(games)
