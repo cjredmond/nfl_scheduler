@@ -147,4 +147,52 @@ while len(amount) < 128:
         a = open('blank_game_output.csv', 'w')
         b = csv.writer(a)
         for y in new_amount:
-            a.write(str(y.week) + y.home.name + y.away.name+ "\n")
+            a.write(str(y.week) + "," + y.home.name + "," + y.away.name+ "\n")
+
+
+with open('correct_non_bye_weeks.csv') as infile:
+    reader = csv.reader(infile)
+    for row in reader:
+        amount.append(Game(int(row[0]),find_team(row[1]),find_team(row[2])))
+
+def bye_weeks(team):
+    print(team.name)
+    weeks = [4,5,6,7,8,9,10,11,13]
+    for week in team.weeks_already_played(games):
+        if week in weeks:
+            weeks.remove(week)
+    if len(weeks) > 0:
+        rand_week = random.choice(weeks)
+        weeks.remove(rand_week)
+        avl_games = team.games_available(games)
+        choice = random.choice(avl_games)
+        frozen = 0
+        while choice.home.do_they_play_this_week(rand_week,games) or choice.away.do_they_play_this_week(rand_week,games):
+            choice = random.choice(avl_games)
+            frozen += 1
+            if frozen == 50:
+                bye_freeze_stopper(team)
+                return 'ehh'
+        choice.week = rand_week
+        #print(choice.week,choice.home.name,choice.away.name)
+        amount.append(choice)
+        print(len(amount))
+    else:
+        return bye_freeze_stopper(team)
+
+def bye_freeze_stopper(team):
+    choices = [game for game in games if game.home == team or game.away == team]
+    non_bye_weeks = [0,1,2,3,12,14,15,16,17]
+    for game in choices:
+        if game.week in non_bye_weeks:
+            choices.remove(game)
+    choices = sorted(choices, key= lambda t: -t.bye_delete_target(games))
+    choices = choices[:2]
+    x = random.choice(amount)
+    while x.week in non_bye_weeks:
+        x = random.choice(amount)
+    choices.append(x)
+    for game in choices:
+        if game in amount:
+            amount.remove(game)
+        game.week = 0
