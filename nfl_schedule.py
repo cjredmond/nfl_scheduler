@@ -129,31 +129,11 @@ def freeze_stopper(team):
 # print(possible_teams_week(1,teams))
 x = find_team('Packers')
 
-amount = []
-for game in games:
-    if game.week != 0:
-        amount.append(game)
 
-
-while len(amount) < 100:
-    team = random.choice(teams)
-    non_bye_weeks(team)
-
-while len(amount) < 128:
-    team = sorted(teams, key= lambda t: -t.non_bye_options(games))[0]
-    non_bye_weeks(team)
-    if len(amount) > 115:
-        new_amount = sorted(amount, key = lambda t: t.week)
-        a = open('blank_game_output.csv', 'w')
-        b = csv.writer(a)
-        for y in new_amount:
-            a.write(str(y.week) + "," + y.home.name + "," + y.away.name+ "\n")
-
-
-with open('correct_non_bye_weeks.csv') as infile:
-    reader = csv.reader(infile)
-    for row in reader:
-        amount.append(Game(int(row[0]),find_team(row[1]),find_team(row[2])))
+# with open('correct_non_bye_weeks.csv') as infile:
+#     reader = csv.reader(infile)
+#     for row in reader:
+#         amount.append(Game(int(row[0]),find_team(row[1]),find_team(row[2])))
 
 def bye_weeks(team):
     print(team.name)
@@ -182,11 +162,12 @@ def bye_weeks(team):
 
 def bye_freeze_stopper(team):
     choices = [game for game in games if game.home == team or game.away == team]
-    non_bye_weeks = [0,1,2,3,12,14,15,16,17]
+    new_choices = []
     for game in choices:
-        if game.week in non_bye_weeks:
-            choices.remove(game)
-    choices = sorted(choices, key= lambda t: -t.bye_delete_target(games))
+        non_bye_weeks = [0,1,2,3,12,14,15,16,17]
+        if not int(game.week) in non_bye_weeks:
+            new_choices.append(game)
+    choices = sorted(new_choices, key= lambda t: -t.bye_delete_target(games))
     choices = choices[:2]
     x = random.choice(amount)
     while x.week in non_bye_weeks:
@@ -196,3 +177,36 @@ def bye_freeze_stopper(team):
         if game in amount:
             amount.remove(game)
         game.week = 0
+
+amount = []
+for game in games:
+    if game.week != 0:
+        amount.append(game)
+
+while len(amount) < 100:
+    team = random.choice(teams)
+    non_bye_weeks(team)
+
+while len(amount) < 128:
+    team = sorted(teams, key= lambda t: -t.non_bye_options(games))[0]
+    non_bye_weeks(team)
+    if len(amount) > 115:
+        new_amount = sorted(amount, key = lambda t: t.week)
+        a = open('blank_game_output.csv', 'w')
+        b = csv.writer(a)
+        for y in new_amount:
+            a.write(str(y.week) + "," + y.home.name + "," + y.away.name+ "\n")
+
+while len(amount) < 200:
+    team = random.choice(teams)
+    bye_weeks(team)
+
+while len(amount) < 256:
+    team = sorted(teams, key= lambda t: -t.bye_options(games))[0]
+    bye_weeks(team)
+    if len(amount) > 220:
+        new_amount = sorted(amount, key = lambda t: t.week)
+        a = open('blank_game_output.csv', 'w')
+        b = csv.writer(a)
+        for y in new_amount:
+            a.write(str(y.week) + "," + y.home.name + "," + y.away.name+ "\n")
