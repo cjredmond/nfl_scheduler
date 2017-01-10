@@ -1,5 +1,3 @@
-
-
 class Team:
     def __init__(self,name,div,conf_div_home_1,conf_div_home_2,conf_div_away_1,conf_div_away_2,
            out_conf_home_1,out_conf_home_2,out_conf_away_1,out_conf_away_2,rank_home,rank_away):
@@ -58,28 +56,6 @@ class Team:
                 sched.append(game)
         return sched
 
-    def non_bye_options(self,ls):
-        total = 0
-        for game in self.total_schedule(ls):
-            total += game.matching_weeks_non_bye(ls)
-        return total
-
-    def bye_options(self,ls):
-        total = 0
-        for game in self.total_schedule(ls):
-            total += game.matching_weeks(ls)
-        return total
-
-    def __str__(self):
-        return self.name
-
-    def __unicode__(self):
-        return self.name
-
-    def __repr__(self):
-        return self.name
-
-
 class Game:
     def __init__(self,week,home,away):
         self.week = week
@@ -94,34 +70,3 @@ class Game:
 
     def __repr__(self):
         return str(self.week) + str(self.home.name)+ str(self.away.name)
-
-    def matching_weeks_non_bye(self,ls):
-        weeks = [1,2,3,12,14,15,16,17]
-        for game in self.home.total_schedule(ls):
-            if game.week != 0:
-                weeks.remove(game.week)
-        for game in self.away.total_schedule(ls):
-            if game.week != 0:
-                if game.week in weeks:
-                    weeks.remove(game.week)
-        return len(weeks)
-
-    def matching_weeks(self, ls):
-        weeks = [4,5,6,7,8,9,10,11,13]
-        for game in self.home.total_schedule(ls):
-            if game.week in weeks:
-                weeks.remove(game.week)
-        for game in self.away.total_schedule(ls):
-            if game.week in weeks:
-                if game in weeks:
-                    weeks.remove(game.week)
-        return len(weeks)
-
-    def delete_target(self,ls):
-        return self.home.non_bye_options(ls) + self.away.non_bye_options(ls)
-
-    def bye_delete_target(self,ls):
-        return self.home.bye_options(ls) + self.away.bye_options(ls)
-
-    def new_matching_weeks(self,ls):
-        weeks = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]

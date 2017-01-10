@@ -83,7 +83,7 @@ def week_17():
 week_17()
 
 def non_bye_weeks(team):
-    print(team.name,team.non_bye_options(games))
+    print(team.name, "NON")
     weeks = [1,2,3,12,14,15,16]
     for week in team.weeks_already_played(games):
         if week in weeks:
@@ -136,7 +136,7 @@ x = find_team('Packers')
 #         amount.append(Game(int(row[0]),find_team(row[1]),find_team(row[2])))
 
 def bye_weeks(team):
-    print(team.name)
+    print(team.name, "BYE")
     weeks = [4,5,6,7,8,9,10,11,13]
     for week in team.weeks_already_played(games):
         if week in weeks:
@@ -183,30 +183,141 @@ for game in games:
     if game.week != 0:
         amount.append(game)
 
-while len(amount) < 100:
-    team = random.choice(teams)
-    non_bye_weeks(team)
+# while len(amount) < 115:
+#     team = random.choice(teams)
+#     non_bye_weeks(team)
+#
+# while len(amount) < 128:
+#     team = sorted(teams, key= lambda t: -t.non_bye_options(games))[0]
+#     non_bye_weeks(team)
+#     if len(amount) > 115:
+#         new_amount = sorted(amount, key = lambda t: t.week)
+#         a = open('blank_game_output.csv', 'w')
+#         b = csv.writer(a)
+#         for y in new_amount:
+#             a.write(str(y.week) + "," + y.home.name + "," + y.away.name+ "\n")
+#
+# while len(amount) < 200:
+#     team = random.choice(teams)
+#     bye_weeks(team)
+#
+# while len(amount) < 256:
+#     team = sorted(teams, key= lambda t: -t.bye_options(games))[0]
+#     bye_weeks(team)
+#     if len(amount) > 220:
+#         new_amount = sorted(amount, key = lambda t: t.week)
+#         a = open('blank_game_output.csv', 'w')
+#         b = csv.writer(a)
+#         for y in new_amount:
+#             a.write(str(y.week) + "," + y.home.name + "," + y.away.name+ "\n")
 
-while len(amount) < 128:
-    team = sorted(teams, key= lambda t: -t.non_bye_options(games))[0]
-    non_bye_weeks(team)
-    if len(amount) > 115:
-        new_amount = sorted(amount, key = lambda t: t.week)
-        a = open('blank_game_output.csv', 'w')
-        b = csv.writer(a)
-        for y in new_amount:
-            a.write(str(y.week) + "," + y.home.name + "," + y.away.name+ "\n")
+def scheduler(team):
+    byes = [4,5,6,7,8,9,10,11,13]
+    non_byes = [1,2,3,12,14,15,16,17]
+    for week in team.weeks_already_played(games):
+        if week in byes:
+            byes.remove(week)
+        if week in non_byes:
+            non_byes.remove(week)
+    if len(byes) + len(non_byes) > 1:
+        coinflip = random.random()
+    if coinflip > .5:
+        new_non_bye_weeks(team)
+    else:
+        new_bye_weeks(team)
 
-while len(amount) < 200:
+def new_non_bye_weeks(team):
+    print(team.name, "NON")
+    weeks = [1,2,3,12,14,15,16]
+    for week in team.weeks_already_played(games):
+        if week in weeks:
+            weeks.remove(week)
+    if len(weeks) > 0:
+        rand_week = random.choice(weeks)
+        weeks.remove(rand_week)
+        avl_games = team.games_available(games)
+        choice = random.choice(avl_games)
+        frozen = 0
+        while choice.home.do_they_play_this_week(rand_week,games) or choice.away.do_they_play_this_week(rand_week,games):
+            choice = random.choice(avl_games)
+            frozen += 1
+            if frozen == 50:
+                freeze_stopper(team)
+                return 'ehh'
+        choice.week = rand_week
+        #print(choice.week,choice.home.name,choice.away.name)
+        amount.append(choice)
+        print(len(amount))
+    else:
+        return new_freeze_stopper(team)
+
+def new_freeze_stopper(team):
+    choices = [game for game in games if game.home == team or game.away == team]
+    new_choices = []
+    for game in choices:
+        if game.week != 0 and game.week != 17:
+            new_choices.append(game)
+    choices = sorted(new_choices, key= lambda t: -t.delete_target(games))
+    choices = choices[:2]
+    print(choices)
+    x = random.choice(amount)
+    print(x)
+    choices.append(x)
+    for game in choices:
+        if game.week == 17:
+            pass
+        else:
+            if game in amount:
+                amount.remove(game)
+            game.week = 0
+
+def new_bye_weeks(team):
+    print(team.name, "BYE")
+    weeks = [4,5,6,7,8,9,10,11,13]
+    for week in team.weeks_already_played(games):
+        if week in weeks:
+            weeks.remove(week)
+    if len(weeks) > 1:
+        rand_week = random.choice(weeks)
+        weeks.remove(rand_week)
+        avl_games = team.games_available(games)
+        choice = random.choice(avl_games)
+        frozen = 0
+        while choice.home.do_they_play_this_week(rand_week,games) or choice.away.do_they_play_this_week(rand_week,games):
+            choice = random.choice(avl_games)
+            frozen += 1
+            if frozen == 50:
+                bye_freeze_stopper(team)
+                return 'ehh'
+        choice.week = rand_week
+        #print(choice.week,choice.home.name,choice.away.name)
+        amount.append(choice)
+        print(len(amount))
+    else:
+        return new_bye_freeze_stopper(team)
+
+def new_bye_freeze_stopper(team):
+    choices = [game for game in games if game.home == team or game.away == team]
+    new_choices = []
+    for game in choices:
+        non_bye_weeks = [0,1,2,3,12,14,15,16,17]
+        if not int(game.week) in non_bye_weeks:
+            new_choices.append(game)
+    choices = sorted(new_choices, key= lambda t: -t.bye_delete_target(games))
+    choices = choices[:2]
+    x = random.choice(amount)
+    while x.week in non_bye_weeks:
+        x = random.choice(amount)
+    choices.append(x)
+    for game in choices:
+        if game in amount:
+            amount.remove(game)
+        game.week = 0
+
+while len(amount) < 150:
     team = random.choice(teams)
-    bye_weeks(team)
+    scheduler(team)
 
 while len(amount) < 256:
     team = sorted(teams, key= lambda t: -t.bye_options(games))[0]
-    bye_weeks(team)
-    if len(amount) > 220:
-        new_amount = sorted(amount, key = lambda t: t.week)
-        a = open('blank_game_output.csv', 'w')
-        b = csv.writer(a)
-        for y in new_amount:
-            a.write(str(y.week) + "," + y.home.name + "," + y.away.name+ "\n")
+    scheduler(team)
