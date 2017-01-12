@@ -14,6 +14,7 @@ class Team:
            self.rank_home = rank_home
            self.rank_away = rank_away
 
+
     def do_they_play_this_week(self, week, ls):
         if [x for x in ls if x.week == week and x.home == self] or [x for x in ls if x.week == week and x.away == self]:
             return True

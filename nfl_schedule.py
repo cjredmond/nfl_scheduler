@@ -221,7 +221,11 @@ def scheduler(team):
             non_byes.remove(week)
     if len(byes) + len(non_byes) > 1:
         coinflip = random.random()
-    if coinflip > .5:
+    else:
+        return 'Done'
+    if len(non_byes) == 0:
+        new_bye_weeks(team)
+    elif coinflip > .5:
         new_non_bye_weeks(team)
     else:
         new_bye_weeks(team)
@@ -242,7 +246,7 @@ def new_non_bye_weeks(team):
             choice = random.choice(avl_games)
             frozen += 1
             if frozen == 50:
-                freeze_stopper(team)
+                new_freeze_stopper(team)
                 return 'ehh'
         choice.week = rand_week
         #print(choice.week,choice.home.name,choice.away.name)
@@ -257,14 +261,14 @@ def new_freeze_stopper(team):
     for game in choices:
         if game.week != 0 and game.week != 17:
             new_choices.append(game)
-    choices = sorted(new_choices, key= lambda t: -t.delete_target(games))
+    choices = sorted(new_choices, key= lambda t: -t.new_delete_target(games))
     choices = choices[:2]
     print(choices)
     x = random.choice(amount)
     print(x)
     choices.append(x)
     for game in choices:
-        if game.week == 17:
+        if game.week == 17 or game.london == True:
             pass
         else:
             if game in amount:
@@ -310,11 +314,34 @@ def new_bye_freeze_stopper(team):
         x = random.choice(amount)
     choices.append(x)
     for game in choices:
-        if game in amount:
+        if game.london == True:
+            pass
+        elif game in amount:
             amount.remove(game)
         game.week = 0
 
-while len(amount) < 150:
+def london():
+    first = game_searcher(find_team('Dolphins'), find_team('Saints'))
+    first.week = 3
+    first.london = True
+    second = game_searcher(find_team('Jaguars'), find_team('Ravens'))
+    second.week = 4
+    second.london = True
+    third = game_searcher(find_team('Browns'), find_team('Vikings'))
+    third.week = 7
+    third.london = True
+    fourth = game_searcher(find_team('Rams'), find_team('Cardinals'))
+    fourth.week = 8
+    fourth.london = True
+
+
+
+london()
+
+
+
+#
+while len(amount) < 215:
     team = random.choice(teams)
     scheduler(team)
 

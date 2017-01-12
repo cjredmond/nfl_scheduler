@@ -85,6 +85,7 @@ class Game:
         self.week = week
         self.home = home
         self.away = away
+        self.london = False
 
     def __str__(self):
         return str(self.week) + self.home.name + self.away.name
@@ -125,3 +126,13 @@ class Game:
 
     def new_matching_weeks(self,ls):
         weeks = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]
+        for game in self.home.total_schedule(ls):
+            if game.week in weeks:
+                weeks.remove(game.week)
+        for game in self.away.total_schedule(ls):
+            if game.week in weeks:
+                weeks.remove(game.week)
+        return len(weeks)
+
+    def new_delete_target(self,ls):
+        return self.home.bye_options(ls) + self.away.bye_options(ls)
